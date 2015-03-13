@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	DEFAULT_ORDER = 4
-	MIN_ORDER     = 3
-	MAX_ORDER     = 20
+	defaultOrder = 4
+	minOrder     = 3
+	maxOrder     = 20
 
-	order          = DEFAULT_ORDER
+	order          = defaultOrder
 	queue          *node
 	verbose_output = false
 	version        = 0.1
