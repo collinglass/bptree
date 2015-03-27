@@ -20,7 +20,7 @@ var (
 )
 
 type Tree struct {
-	root *node
+	Root *node
 }
 
 type record struct {
@@ -53,7 +53,7 @@ func (t *Tree) Insert(key, value int) error {
 		return err
 	}
 
-	if t.root == nil {
+	if t.Root == nil {
 		return t.startNewTree(key, pointer)
 	}
 
@@ -122,12 +122,12 @@ func (t *Tree) PrintTree() {
 	rank := 0
 	new_rank := 0
 
-	if t.root == nil {
+	if t.Root == nil {
 		fmt.Printf("Empty tree.\n")
 		return
 	}
 	queue = nil
-	enqueue(t.root)
+	enqueue(t.Root)
 	for queue != nil {
 		n = dequeue()
 		if n != nil {
@@ -166,13 +166,13 @@ func (t *Tree) PrintTree() {
 }
 
 func (t *Tree) PrintLeaves() {
-	if t.root == nil {
+	if t.Root == nil {
 		fmt.Printf("Empty tree.\n")
 		return
 	}
 
 	var i int
-	c := t.root
+	c := t.Root
 	for !c.is_leaf {
 		c, _ = c.pointers[0].(*node)
 	}
@@ -248,7 +248,7 @@ func dequeue() *node {
 
 func (t *Tree) height() int {
 	h := 0
-	c := t.root
+	c := t.Root
 	for !c.is_leaf {
 		c, _ = c.pointers[0].(*node)
 		h++
@@ -259,7 +259,7 @@ func (t *Tree) height() int {
 func (t *Tree) pathToRoot(child *node) int {
 	length := 0
 	c := child
-	for c != t.root {
+	for c != t.Root {
 		c = c.parent
 		length += 1
 	}
@@ -293,7 +293,7 @@ func (t *Tree) findRange(key_start, key_end int, verbose bool, returned_keys []i
 
 func (t *Tree) findLeaf(key int, verbose bool) *node {
 	i := 0
-	c := t.root
+	c := t.Root
 	if c == nil {
 		if verbose {
 			fmt.Printf("Empty tree.\n")
@@ -571,30 +571,30 @@ func (t *Tree) insertIntoParent(left *node, key int, right *node) error {
 }
 
 func (t *Tree) insertIntoNewRoot(left *node, key int, right *node) error {
-	t.root, err = makeNode()
+	t.Root, err = makeNode()
 	if err != nil {
 		return err
 	}
-	t.root.keys[0] = key
-	t.root.pointers[0] = left
-	t.root.pointers[1] = right
-	t.root.num_keys += 1
-	t.root.parent = nil
-	left.parent = t.root
-	right.parent = t.root
+	t.Root.keys[0] = key
+	t.Root.pointers[0] = left
+	t.Root.pointers[1] = right
+	t.Root.num_keys += 1
+	t.Root.parent = nil
+	left.parent = t.Root
+	right.parent = t.Root
 	return nil
 }
 
 func (t *Tree) startNewTree(key int, pointer *record) error {
-	t.root, err = makeLeaf()
+	t.Root, err = makeLeaf()
 	if err != nil {
 		return err
 	}
-	t.root.keys[0] = key
-	t.root.pointers[0] = pointer
-	t.root.pointers[order-1] = nil
-	t.root.parent = nil
-	t.root.num_keys += 1
+	t.Root.keys[0] = key
+	t.Root.pointers[0] = pointer
+	t.Root.pointers[order-1] = nil
+	t.Root.parent = nil
+	t.Root.num_keys += 1
 	return nil
 }
 
@@ -652,17 +652,17 @@ func removeEntryFromNode(n *node, key int, pointer interface{}) *node {
 func (t *Tree) adjustRoot() {
 	var new_root *node
 
-	if t.root.num_keys > 0 {
+	if t.Root.num_keys > 0 {
 		return
 	}
 
-	if !t.root.is_leaf {
-		new_root, _ = t.root.pointers[0].(*node)
+	if !t.Root.is_leaf {
+		new_root, _ = t.Root.pointers[0].(*node)
 		new_root.parent = nil
 	} else {
 		new_root = nil
 	}
-	t.root = new_root
+	t.Root = new_root
 
 	return
 }
@@ -768,7 +768,7 @@ func (t *Tree) deleteEntry(n *node, key int, pointer interface{}) {
 
 	n = removeEntryFromNode(n, key, pointer)
 
-	if n == t.root {
+	if n == t.Root {
 		t.adjustRoot()
 		return
 	}

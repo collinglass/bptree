@@ -90,8 +90,8 @@ func TestInsertSameKeyTwice(t *testing.T) {
 		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
-	if tree.root.num_keys > 1 {
-		t.Errorf("expected 1 key and got %d", tree.root.num_keys)
+	if tree.Root.num_keys > 1 {
+		t.Errorf("expected 1 key and got %d", tree.Root.num_keys)
 	}
 }
 
@@ -123,8 +123,8 @@ func TestInsertSameValueTwice(t *testing.T) {
 		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
-	if tree.root.num_keys <= 1 {
-		t.Errorf("expected more than 1 key and got %d", tree.root.num_keys)
+	if tree.Root.num_keys <= 1 {
+		t.Errorf("expected more than 1 key and got %d", tree.Root.num_keys)
 	}
 }
 
