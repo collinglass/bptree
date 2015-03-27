@@ -31,8 +31,8 @@ func TestInsertNilRoot(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 }
 
@@ -56,8 +56,8 @@ func TestInsert(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 }
 
@@ -86,8 +86,8 @@ func TestInsertSameKeyTwice(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	if root.num_keys > 1 {
@@ -119,8 +119,8 @@ func TestInsertSameValueTwice(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	if root.num_keys <= 1 {
@@ -161,8 +161,8 @@ func TestFind(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 }
 
@@ -206,8 +206,8 @@ func TestDelete(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	root, err = Delete(root, key)
@@ -245,8 +245,8 @@ func TestDeleteNotFound(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	root, err = Delete(root, key+1)
@@ -296,8 +296,8 @@ func TestMultiInsertSingleDelete(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	root, err = Delete(root, key)
@@ -351,8 +351,8 @@ func TestMultiInsertMultiDelete(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	root, err = Delete(root, key)
@@ -378,8 +378,8 @@ func TestMultiInsertMultiDelete(t *testing.T) {
 		t.Errorf("returned nil \n")
 	}
 
-	if r.value != value+3 {
-		t.Errorf("expected %v and got %v \n", value, r.value)
+	if r.Value != value+3 {
+		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
 
 	root, err = Delete(root, key+3)
