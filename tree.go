@@ -14,26 +14,26 @@ var (
 	maxOrder     = 20
 
 	order          = defaultOrder
-	queue          *node
+	queue          *Node
 	verbose_output = false
 	version        = 0.1
 )
 
 type Tree struct {
-	Root *node
+	Root *Node
 }
 
-type record struct {
+type Record struct {
 	Value int
 }
 
-type node struct {
-	pointers []interface{}
-	keys     []int
-	parent   *node
-	is_leaf  bool
-	num_keys int
-	next     *node
+type Node struct {
+	Pointers []interface{}
+	Keys     []int
+	Parent   *Node
+	IsLeaf   bool
+	NumKeys  int
+	Next     *Node
 }
 
 func NewTree() *Tree {
@@ -41,8 +41,8 @@ func NewTree() *Tree {
 }
 
 func (t *Tree) Insert(key, value int) error {
-	var pointer *record
-	var leaf *node
+	var pointer *Record
+	var leaf *Node
 
 	if _, err := t.Find(key, false); err == nil {
 		return errors.New("key already exists")
@@ -59,7 +59,7 @@ func (t *Tree) Insert(key, value int) error {
 
 	leaf = t.findLeaf(key, false)
 
-	if leaf.num_keys < order-1 {
+	if leaf.NumKeys < order-1 {
 		insertIntoLeaf(leaf, key, pointer)
 		return nil
 	}
@@ -67,22 +67,22 @@ func (t *Tree) Insert(key, value int) error {
 	return t.insertIntoLeafAfterSplitting(leaf, key, pointer)
 }
 
-func (t *Tree) Find(key int, verbose bool) (*record, error) {
+func (t *Tree) Find(key int, verbose bool) (*Record, error) {
 	i := 0
 	c := t.findLeaf(key, verbose)
 	if c == nil {
 		return nil, errors.New("key not found")
 	}
-	for i = 0; i < c.num_keys; i++ {
-		if c.keys[i] == key {
+	for i = 0; i < c.NumKeys; i++ {
+		if c.Keys[i] == key {
 			break
 		}
 	}
-	if i == c.num_keys {
+	if i == c.NumKeys {
 		return nil, errors.New("key not found")
 	}
 
-	r, _ := c.pointers[i].(*record)
+	r, _ := c.Pointers[i].(*Record)
 
 	return r, nil
 }
@@ -107,7 +107,7 @@ func (t *Tree) FindAndPrintRange(key_start, key_end int, verbose bool) {
 		fmt.Println("None found,\n")
 	} else {
 		for i = 0; i < num_found; i++ {
-			c, _ := returned_pointers[i].(*record)
+			c, _ := returned_pointers[i].(*Record)
 			fmt.Printf("Key: %d  Location: %d  Value: %d\n",
 				returned_keys[i],
 				returned_pointers[i],
@@ -117,7 +117,7 @@ func (t *Tree) FindAndPrintRange(key_start, key_end int, verbose bool) {
 }
 
 func (t *Tree) PrintTree() {
-	var n *node
+	var n *Node
 	i := 0
 	rank := 0
 	new_rank := 0
@@ -131,7 +131,7 @@ func (t *Tree) PrintTree() {
 	for queue != nil {
 		n = dequeue()
 		if n != nil {
-			if n.parent != nil && n == n.parent.pointers[0] {
+			if n.Parent != nil && n == n.Parent.Pointers[0] {
 				new_rank = t.pathToRoot(n)
 				if new_rank != rank {
 					fmt.Printf("\n")
@@ -140,23 +140,23 @@ func (t *Tree) PrintTree() {
 			if verbose_output {
 				fmt.Printf("(%d)", n)
 			}
-			for i = 0; i < n.num_keys; i++ {
+			for i = 0; i < n.NumKeys; i++ {
 				if verbose_output {
-					fmt.Printf("%d ", n.pointers[i])
+					fmt.Printf("%d ", n.Pointers[i])
 				}
-				fmt.Printf("%d ", n.keys[i])
+				fmt.Printf("%d ", n.Keys[i])
 			}
-			if !n.is_leaf {
-				for i = 0; i <= n.num_keys; i++ {
-					c, _ := n.pointers[i].(*node)
+			if !n.IsLeaf {
+				for i = 0; i <= n.NumKeys; i++ {
+					c, _ := n.Pointers[i].(*Node)
 					enqueue(c)
 				}
 			}
 			if verbose_output {
-				if n.is_leaf {
-					fmt.Printf("%d ", n.pointers[order-1])
+				if n.IsLeaf {
+					fmt.Printf("%d ", n.Pointers[order-1])
 				} else {
-					fmt.Printf("%d ", n.pointers[n.num_keys])
+					fmt.Printf("%d ", n.Pointers[n.NumKeys])
 				}
 			}
 			fmt.Printf(" | ")
@@ -173,23 +173,23 @@ func (t *Tree) PrintLeaves() {
 
 	var i int
 	c := t.Root
-	for !c.is_leaf {
-		c, _ = c.pointers[0].(*node)
+	for !c.IsLeaf {
+		c, _ = c.Pointers[0].(*Node)
 	}
 
 	for {
-		for i = 0; i < c.num_keys; i++ {
+		for i = 0; i < c.NumKeys; i++ {
 			if verbose_output {
-				fmt.Printf("%d ", c.pointers[i])
+				fmt.Printf("%d ", c.Pointers[i])
 			}
-			fmt.Printf("%d ", c.keys[i])
+			fmt.Printf("%d ", c.Keys[i])
 		}
 		if verbose_output {
-			fmt.Printf("%d ", c.pointers[order-1])
+			fmt.Printf("%d ", c.Pointers[order-1])
 		}
-		if c.pointers[order-1] != nil {
+		if c.Pointers[order-1] != nil {
 			fmt.Printf(" | ")
-			c, _ = c.pointers[order-1].(*node)
+			c, _ = c.Pointers[order-1].(*Node)
 		} else {
 			break
 		}
@@ -224,43 +224,43 @@ func (t *Tree) Delete(key int) error {
 //
 //
 //
-func enqueue(new_node *node) {
-	var c *node
+func enqueue(new_node *Node) {
+	var c *Node
 	if queue == nil {
 		queue = new_node
-		queue.next = nil
+		queue.Next = nil
 	} else {
 		c = queue
-		for c.next != nil {
-			c = c.next
+		for c.Next != nil {
+			c = c.Next
 		}
-		c.next = new_node
-		new_node.next = nil
+		c.Next = new_node
+		new_node.Next = nil
 	}
 }
 
-func dequeue() *node {
+func dequeue() *Node {
 	n := queue
-	queue = queue.next
-	n.next = nil
+	queue = queue.Next
+	n.Next = nil
 	return n
 }
 
 func (t *Tree) height() int {
 	h := 0
 	c := t.Root
-	for !c.is_leaf {
-		c, _ = c.pointers[0].(*node)
+	for !c.IsLeaf {
+		c, _ = c.Pointers[0].(*Node)
 		h++
 	}
 	return h
 }
 
-func (t *Tree) pathToRoot(child *node) int {
+func (t *Tree) pathToRoot(child *Node) int {
 	length := 0
 	c := child
 	for c != t.Root {
-		c = c.parent
+		c = c.Parent
 		length += 1
 	}
 	return length
@@ -274,24 +274,24 @@ func (t *Tree) findRange(key_start, key_end int, verbose bool, returned_keys []i
 	if n == nil {
 		return 0
 	}
-	for i = 0; i < n.num_keys && n.keys[i] < key_start; i++ {
-		if i == n.num_keys { // could be wrong
+	for i = 0; i < n.NumKeys && n.Keys[i] < key_start; i++ {
+		if i == n.NumKeys { // could be wrong
 			return 0
 		}
 	}
 	for n != nil {
-		for i = i; i < n.num_keys && n.keys[i] <= key_end; i++ {
-			returned_keys[num_found] = n.keys[i]
-			returned_pointers[num_found] = n.pointers[i]
+		for i = i; i < n.NumKeys && n.Keys[i] <= key_end; i++ {
+			returned_keys[num_found] = n.Keys[i]
+			returned_pointers[num_found] = n.Pointers[i]
 			num_found += 1
 		}
-		n, _ = n.pointers[order-1].(*node)
+		n, _ = n.Pointers[order-1].(*Node)
 		i = 0
 	}
 	return num_found
 }
 
-func (t *Tree) findLeaf(key int, verbose bool) *node {
+func (t *Tree) findLeaf(key int, verbose bool) *Node {
 	i := 0
 	c := t.Root
 	if c == nil {
@@ -300,17 +300,17 @@ func (t *Tree) findLeaf(key int, verbose bool) *node {
 		}
 		return c
 	}
-	for !c.is_leaf {
+	for !c.IsLeaf {
 		if verbose {
 			fmt.Printf("[")
-			for i = 0; i < c.num_keys-1; i++ {
-				fmt.Printf("%d ", c.keys[i])
+			for i = 0; i < c.NumKeys-1; i++ {
+				fmt.Printf("%d ", c.Keys[i])
 			}
-			fmt.Printf("%d]", c.keys[i])
+			fmt.Printf("%d]", c.Keys[i])
 		}
 		i = 0
-		for i < c.num_keys {
-			if key >= c.keys[i] {
+		for i < c.NumKeys {
+			if key >= c.Keys[i] {
 				i += 1
 			} else {
 				break
@@ -319,14 +319,14 @@ func (t *Tree) findLeaf(key int, verbose bool) *node {
 		if verbose {
 			fmt.Printf("%d ->\n", i)
 		}
-		c, _ = c.pointers[i].(*node)
+		c, _ = c.Pointers[i].(*Node)
 	}
 	if verbose {
 		fmt.Printf("Leaf [")
-		for i = 0; i < c.num_keys-1; i++ {
-			fmt.Printf("%d ", c.keys[i])
+		for i = 0; i < c.NumKeys-1; i++ {
+			fmt.Printf("%d ", c.Keys[i])
 		}
-		fmt.Printf("%d] ->\n", c.keys[i])
+		fmt.Printf("%d] ->\n", c.Keys[i])
 	}
 	return c
 }
@@ -342,8 +342,8 @@ func cut(length int) int {
 //
 //	INSERTION
 //
-func makeRecord(value int) (*record, error) {
-	new_record := new(record)
+func makeRecord(value int) (*Record, error) {
+	new_record := new(Record)
 	if new_record == nil {
 		return nil, errors.New("Error: Record creation.")
 	} else {
@@ -352,62 +352,62 @@ func makeRecord(value int) (*record, error) {
 	return new_record, nil
 }
 
-func makeNode() (*node, error) {
-	new_node := new(node)
+func makeNode() (*Node, error) {
+	new_node := new(Node)
 	if new_node == nil {
 		return nil, errors.New("Error: Node creation.")
 	}
-	new_node.keys = make([]int, order-1)
-	if new_node.keys == nil {
+	new_node.Keys = make([]int, order-1)
+	if new_node.Keys == nil {
 		return nil, errors.New("Error: New node keys array.")
 	}
-	new_node.pointers = make([]interface{}, order)
-	if new_node.keys == nil {
+	new_node.Pointers = make([]interface{}, order)
+	if new_node.Keys == nil {
 		return nil, errors.New("Error: New node pointers array.")
 	}
-	new_node.is_leaf = false
-	new_node.num_keys = 0
-	new_node.parent = nil
-	new_node.next = nil
+	new_node.IsLeaf = false
+	new_node.NumKeys = 0
+	new_node.Parent = nil
+	new_node.Next = nil
 	return new_node, nil
 }
 
-func makeLeaf() (*node, error) {
+func makeLeaf() (*Node, error) {
 	leaf, err := makeNode()
 	if err != nil {
 		return nil, err
 	}
-	leaf.is_leaf = true
+	leaf.IsLeaf = true
 	return leaf, nil
 }
 
-func getLeftIndex(parent, left *node) int {
+func getLeftIndex(parent, left *Node) int {
 	left_index := 0
-	for left_index <= parent.num_keys && parent.pointers[left_index] != left {
+	for left_index <= parent.NumKeys && parent.Pointers[left_index] != left {
 		left_index += 1
 	}
 	return left_index
 }
 
-func insertIntoLeaf(leaf *node, key int, pointer *record) {
+func insertIntoLeaf(leaf *Node, key int, pointer *Record) {
 	var i, insertion_point int
 
-	for insertion_point < leaf.num_keys && leaf.keys[insertion_point] < key {
+	for insertion_point < leaf.NumKeys && leaf.Keys[insertion_point] < key {
 		insertion_point += 1
 	}
 
-	for i = leaf.num_keys; i > insertion_point; i-- {
-		leaf.keys[i] = leaf.keys[i-1]
-		leaf.pointers[i] = leaf.pointers[i-1]
+	for i = leaf.NumKeys; i > insertion_point; i-- {
+		leaf.Keys[i] = leaf.Keys[i-1]
+		leaf.Pointers[i] = leaf.Pointers[i-1]
 	}
-	leaf.keys[insertion_point] = key
-	leaf.pointers[insertion_point] = pointer
-	leaf.num_keys += 1
+	leaf.Keys[insertion_point] = key
+	leaf.Pointers[insertion_point] = pointer
+	leaf.NumKeys += 1
 	return
 }
 
-func (t *Tree) insertIntoLeafAfterSplitting(leaf *node, key int, pointer *record) error {
-	var new_leaf *node
+func (t *Tree) insertIntoLeafAfterSplitting(leaf *Node, key int, pointer *Record) error {
+	var new_leaf *Node
 	var insertion_index, split, new_key, i, j int
 	var err error
 
@@ -426,70 +426,70 @@ func (t *Tree) insertIntoLeafAfterSplitting(leaf *node, key int, pointer *record
 		return errors.New("Error: Temporary pointers array.")
 	}
 
-	for insertion_index < order-1 && leaf.keys[insertion_index] < key {
+	for insertion_index < order-1 && leaf.Keys[insertion_index] < key {
 		insertion_index += 1
 	}
 
-	for i = 0; i < leaf.num_keys; i++ {
+	for i = 0; i < leaf.NumKeys; i++ {
 		if j == insertion_index {
 			j += 1
 		}
-		temp_keys[j] = leaf.keys[i]
-		temp_pointers[j] = leaf.pointers[i]
+		temp_keys[j] = leaf.Keys[i]
+		temp_pointers[j] = leaf.Pointers[i]
 		j += 1
 	}
 
 	temp_keys[insertion_index] = key
 	temp_pointers[insertion_index] = pointer
 
-	leaf.num_keys = 0
+	leaf.NumKeys = 0
 
 	split = cut(order - 1)
 
 	for i = 0; i < split; i++ {
-		leaf.pointers[i] = temp_pointers[i]
-		leaf.keys[i] = temp_keys[i]
-		leaf.num_keys += 1
+		leaf.Pointers[i] = temp_pointers[i]
+		leaf.Keys[i] = temp_keys[i]
+		leaf.NumKeys += 1
 	}
 
 	j = 0
 	for i = split; i < order; i++ {
-		new_leaf.pointers[j] = temp_pointers[i]
-		new_leaf.keys[j] = temp_keys[i]
-		new_leaf.num_keys += 1
+		new_leaf.Pointers[j] = temp_pointers[i]
+		new_leaf.Keys[j] = temp_keys[i]
+		new_leaf.NumKeys += 1
 		j += 1
 	}
 
-	new_leaf.pointers[order-1] = leaf.pointers[order-1]
-	leaf.pointers[order-1] = new_leaf
+	new_leaf.Pointers[order-1] = leaf.Pointers[order-1]
+	leaf.Pointers[order-1] = new_leaf
 
-	for i = leaf.num_keys; i < order-1; i++ {
-		leaf.pointers[i] = nil
+	for i = leaf.NumKeys; i < order-1; i++ {
+		leaf.Pointers[i] = nil
 	}
-	for i = new_leaf.num_keys; i < order-1; i++ {
-		new_leaf.pointers[i] = nil
+	for i = new_leaf.NumKeys; i < order-1; i++ {
+		new_leaf.Pointers[i] = nil
 	}
 
-	new_leaf.parent = leaf.parent
-	new_key = new_leaf.keys[0]
+	new_leaf.Parent = leaf.Parent
+	new_key = new_leaf.Keys[0]
 
 	return t.insertIntoParent(leaf, new_key, new_leaf)
 }
 
-func insertIntoNode(n *node, left_index, key int, right *node) {
+func insertIntoNode(n *Node, left_index, key int, right *Node) {
 	var i int
-	for i = n.num_keys; i > left_index; i-- {
-		n.pointers[i+1] = n.pointers[i]
-		n.keys[i] = n.keys[i-1]
+	for i = n.NumKeys; i > left_index; i-- {
+		n.Pointers[i+1] = n.Pointers[i]
+		n.Keys[i] = n.Keys[i-1]
 	}
-	n.pointers[left_index+1] = right
-	n.keys[left_index] = key
-	n.num_keys += 1
+	n.Pointers[left_index+1] = right
+	n.Keys[left_index] = key
+	n.NumKeys += 1
 }
 
-func (t *Tree) insertIntoNodeAfterSplitting(old_node *node, left_index, key int, right *node) error {
+func (t *Tree) insertIntoNodeAfterSplitting(old_node *Node, left_index, key int, right *Node) error {
 	var i, j, split, k_prime int
-	var new_node, child *node
+	var new_node, child *Node
 	var temp_keys []int
 	var temp_pointers []interface{}
 	var err error
@@ -499,24 +499,25 @@ func (t *Tree) insertIntoNodeAfterSplitting(old_node *node, left_index, key int,
 		return errors.New("Error: Temporary pointers array for splitting nodes.")
 	}
 
-	temp_keys = make([]int, order+1)
+	temp_keys = make([]int, order)
 	if temp_keys == nil {
 		return errors.New("Error: Temporary keys array for splitting nodes.")
 	}
 
-	for i = 0; i < old_node.num_keys+1; i++ {
+	for i = 0; i < old_node.NumKeys+1; i++ {
 		if j == left_index+1 {
 			j += 1
 		}
-		temp_pointers[j] = old_node.pointers[i]
+		temp_pointers[j] = old_node.Pointers[i]
 		j += 1
 	}
 
-	for i = 0; i < old_node.num_keys+1; i++ {
-		if j == left_index+1 {
+	j = 0
+	for i = 0; i < old_node.NumKeys; i++ {
+		if j == left_index {
 			j += 1
 		}
-		temp_keys[j] = old_node.keys[i]
+		temp_keys[j] = old_node.Keys[i]
 		j += 1
 	}
 
@@ -528,41 +529,41 @@ func (t *Tree) insertIntoNodeAfterSplitting(old_node *node, left_index, key int,
 	if err != nil {
 		return err
 	}
-	old_node.num_keys = 0
+	old_node.NumKeys = 0
 	for i = 0; i < split-1; i++ {
-		old_node.pointers[i] = temp_pointers[i]
-		old_node.keys[i] = temp_keys[i]
-		old_node.num_keys += 1
+		old_node.Pointers[i] = temp_pointers[i]
+		old_node.Keys[i] = temp_keys[i]
+		old_node.NumKeys += 1
 	}
-	old_node.pointers[i] = temp_pointers[i]
+	old_node.Pointers[i] = temp_pointers[i]
 	k_prime = temp_keys[split-1]
-	j += 1
+	j = 0
 	for i += 1; i < order; i++ {
-		new_node.pointers[j] = temp_pointers[i]
-		new_node.keys[j] = temp_keys[i]
-		new_node.num_keys += 1
+		new_node.Pointers[j] = temp_pointers[i]
+		new_node.Keys[j] = temp_keys[i]
+		new_node.NumKeys += 1
 		j += 1
 	}
-	new_node.pointers[j] = temp_pointers[i]
-	new_node.parent = old_node.parent
-	for i = 0; i <= new_node.num_keys; i++ {
-		child, _ = new_node.pointers[i].(*node)
-		child.parent = new_node
+	new_node.Pointers[j] = temp_pointers[i]
+	new_node.Parent = old_node.Parent
+	for i = 0; i <= new_node.NumKeys; i++ {
+		child, _ = new_node.Pointers[i].(*Node)
+		child.Parent = new_node
 	}
 
 	return t.insertIntoParent(old_node, k_prime, new_node)
 }
 
-func (t *Tree) insertIntoParent(left *node, key int, right *node) error {
+func (t *Tree) insertIntoParent(left *Node, key int, right *Node) error {
 	var left_index int
-	parent := left.parent
+	parent := left.Parent
 
 	if parent == nil {
 		return t.insertIntoNewRoot(left, key, right)
 	}
 	left_index = getLeftIndex(parent, left)
 
-	if parent.num_keys < order-1 {
+	if parent.NumKeys < order-1 {
 		insertIntoNode(parent, left_index, key, right)
 		return nil
 	}
@@ -570,39 +571,39 @@ func (t *Tree) insertIntoParent(left *node, key int, right *node) error {
 	return t.insertIntoNodeAfterSplitting(parent, left_index, key, right)
 }
 
-func (t *Tree) insertIntoNewRoot(left *node, key int, right *node) error {
+func (t *Tree) insertIntoNewRoot(left *Node, key int, right *Node) error {
 	t.Root, err = makeNode()
 	if err != nil {
 		return err
 	}
-	t.Root.keys[0] = key
-	t.Root.pointers[0] = left
-	t.Root.pointers[1] = right
-	t.Root.num_keys += 1
-	t.Root.parent = nil
-	left.parent = t.Root
-	right.parent = t.Root
+	t.Root.Keys[0] = key
+	t.Root.Pointers[0] = left
+	t.Root.Pointers[1] = right
+	t.Root.NumKeys += 1
+	t.Root.Parent = nil
+	left.Parent = t.Root
+	right.Parent = t.Root
 	return nil
 }
 
-func (t *Tree) startNewTree(key int, pointer *record) error {
+func (t *Tree) startNewTree(key int, pointer *Record) error {
 	t.Root, err = makeLeaf()
 	if err != nil {
 		return err
 	}
-	t.Root.keys[0] = key
-	t.Root.pointers[0] = pointer
-	t.Root.pointers[order-1] = nil
-	t.Root.parent = nil
-	t.Root.num_keys += 1
+	t.Root.Keys[0] = key
+	t.Root.Pointers[0] = pointer
+	t.Root.Pointers[order-1] = nil
+	t.Root.Parent = nil
+	t.Root.NumKeys += 1
 	return nil
 }
 
-func getNeighbourIndex(n *node) int {
+func getNeighbourIndex(n *Node) int {
 	var i int
 
-	for i = 0; i <= n.parent.num_keys; i++ {
-		if reflect.DeepEqual(n.parent.pointers[i], n) {
+	for i = 0; i <= n.Parent.NumKeys; i++ {
+		if reflect.DeepEqual(n.Parent.Pointers[i], n) {
 			return i - 1
 		}
 	}
@@ -610,39 +611,39 @@ func getNeighbourIndex(n *node) int {
 	return i
 }
 
-func removeEntryFromNode(n *node, key int, pointer interface{}) *node {
+func removeEntryFromNode(n *Node, key int, pointer interface{}) *Node {
 	var i, num_pointers int
 
-	for n.keys[i] != key {
+	for n.Keys[i] != key {
 		i += 1
 	}
 
-	for i += 1; i < n.num_keys; i++ {
-		n.keys[i-1] = n.keys[i]
+	for i += 1; i < n.NumKeys; i++ {
+		n.Keys[i-1] = n.Keys[i]
 	}
 
-	if n.is_leaf {
-		num_pointers = n.num_keys
+	if n.IsLeaf {
+		num_pointers = n.NumKeys
 	} else {
-		num_pointers = n.num_keys + 1
+		num_pointers = n.NumKeys + 1
 	}
 
 	i = 0
-	for n.pointers[i] != pointer {
+	for n.Pointers[i] != pointer {
 		i += 1
 	}
 	for i += 1; i < num_pointers; i++ {
-		n.pointers[i-1] = n.pointers[i]
+		n.Pointers[i-1] = n.Pointers[i]
 	}
-	n.num_keys -= 1
+	n.NumKeys -= 1
 
-	if n.is_leaf {
-		for i = n.num_keys; i < order-1; i++ {
-			n.pointers[i] = nil
+	if n.IsLeaf {
+		for i = n.NumKeys; i < order-1; i++ {
+			n.Pointers[i] = nil
 		}
 	} else {
-		for i = n.num_keys + 1; i < order; i++ {
-			n.pointers[i] = nil
+		for i = n.NumKeys + 1; i < order; i++ {
+			n.Pointers[i] = nil
 		}
 	}
 
@@ -650,15 +651,15 @@ func removeEntryFromNode(n *node, key int, pointer interface{}) *node {
 }
 
 func (t *Tree) adjustRoot() {
-	var new_root *node
+	var new_root *Node
 
-	if t.Root.num_keys > 0 {
+	if t.Root.NumKeys > 0 {
 		return
 	}
 
-	if !t.Root.is_leaf {
-		new_root, _ = t.Root.pointers[0].(*node)
-		new_root.parent = nil
+	if !t.Root.IsLeaf {
+		new_root, _ = t.Root.Pointers[0].(*Node)
+		new_root.Parent = nil
 	} else {
 		new_root = nil
 	}
@@ -667,9 +668,9 @@ func (t *Tree) adjustRoot() {
 	return
 }
 
-func (t *Tree) coalesceNodes(n, neighbour *node, neighbour_index, k_prime int) {
+func (t *Tree) coalesceNodes(n, neighbour *Node, neighbour_index, k_prime int) {
 	var i, j, neighbour_insertion_index, n_end int
-	var tmp *node
+	var tmp *Node
 
 	if neighbour_index == -1 {
 		tmp = n
@@ -677,94 +678,94 @@ func (t *Tree) coalesceNodes(n, neighbour *node, neighbour_index, k_prime int) {
 		neighbour = tmp
 	}
 
-	neighbour_insertion_index = neighbour.num_keys
+	neighbour_insertion_index = neighbour.NumKeys
 
-	if !n.is_leaf {
-		neighbour.keys[neighbour_insertion_index] = k_prime
-		neighbour.num_keys += 1
+	if !n.IsLeaf {
+		neighbour.Keys[neighbour_insertion_index] = k_prime
+		neighbour.NumKeys += 1
 
-		n_end = n.num_keys
+		n_end = n.NumKeys
 		i = neighbour_insertion_index + 1
 		for j = 0; j < n_end; j++ {
-			neighbour.keys[i] = n.keys[j]
-			neighbour.pointers[i] = n.pointers[j]
-			neighbour.num_keys += 1
-			n.num_keys -= 1
+			neighbour.Keys[i] = n.Keys[j]
+			neighbour.Pointers[i] = n.Pointers[j]
+			neighbour.NumKeys += 1
+			n.NumKeys -= 1
 			i += 1
 		}
-		neighbour.pointers[i] = n.pointers[j]
+		neighbour.Pointers[i] = n.Pointers[j]
 
-		for i = 0; i < neighbour.num_keys+1; i++ {
-			tmp, _ = neighbour.pointers[i].(*node)
-			tmp.parent = neighbour
+		for i = 0; i < neighbour.NumKeys+1; i++ {
+			tmp, _ = neighbour.Pointers[i].(*Node)
+			tmp.Parent = neighbour
 		}
 	} else {
 		i = neighbour_insertion_index
-		for j = 0; j < n.num_keys; j++ {
-			neighbour.keys[i] = n.keys[j]
-			n.pointers[i] = n.pointers[j]
-			neighbour.num_keys += 1
+		for j = 0; j < n.NumKeys; j++ {
+			neighbour.Keys[i] = n.Keys[j]
+			n.Pointers[i] = n.Pointers[j]
+			neighbour.NumKeys += 1
 		}
-		neighbour.pointers[order-1] = n.pointers[order-1]
+		neighbour.Pointers[order-1] = n.Pointers[order-1]
 	}
 
-	t.deleteEntry(n.parent, k_prime, n)
+	t.deleteEntry(n.Parent, k_prime, n)
 }
 
-func (t *Tree) redistributeNodes(n, neighbour *node, neighbour_index, k_prime_index, k_prime int) {
+func (t *Tree) redistributeNodes(n, neighbour *Node, neighbour_index, k_prime_index, k_prime int) {
 	var i int
-	var tmp *node
+	var tmp *Node
 
 	if neighbour_index != -1 {
-		if !n.is_leaf {
-			n.pointers[n.num_keys+1] = n.pointers[n.num_keys]
+		if !n.IsLeaf {
+			n.Pointers[n.NumKeys+1] = n.Pointers[n.NumKeys]
 		}
-		for i = n.num_keys; i > 0; i-- {
-			n.keys[i] = n.keys[i-1]
-			n.pointers[i] = n.pointers[i-1]
+		for i = n.NumKeys; i > 0; i-- {
+			n.Keys[i] = n.Keys[i-1]
+			n.Pointers[i] = n.Pointers[i-1]
 		}
-		if !n.is_leaf { // why the second if !n.is_leaf
-			n.pointers[0] = neighbour.pointers[neighbour.num_keys]
-			tmp, _ = n.pointers[0].(*node)
-			tmp.parent = n
-			neighbour.pointers[neighbour.num_keys] = nil
-			n.keys[0] = k_prime
-			n.parent.keys[k_prime_index] = neighbour.keys[neighbour.num_keys-1]
+		if !n.IsLeaf { // why the second if !n.IsLeaf
+			n.Pointers[0] = neighbour.Pointers[neighbour.NumKeys]
+			tmp, _ = n.Pointers[0].(*Node)
+			tmp.Parent = n
+			neighbour.Pointers[neighbour.NumKeys] = nil
+			n.Keys[0] = k_prime
+			n.Parent.Keys[k_prime_index] = neighbour.Keys[neighbour.NumKeys-1]
 		} else {
-			n.pointers[0] = neighbour.pointers[neighbour.num_keys-1]
-			neighbour.pointers[neighbour.num_keys-1] = nil
-			n.keys[0] = neighbour.keys[neighbour.num_keys-1]
-			n.parent.keys[k_prime_index] = n.keys[0]
+			n.Pointers[0] = neighbour.Pointers[neighbour.NumKeys-1]
+			neighbour.Pointers[neighbour.NumKeys-1] = nil
+			n.Keys[0] = neighbour.Keys[neighbour.NumKeys-1]
+			n.Parent.Keys[k_prime_index] = n.Keys[0]
 		}
 	} else {
-		if n.is_leaf {
-			n.keys[n.num_keys] = neighbour.keys[0]
-			n.pointers[n.num_keys] = neighbour.pointers[0]
-			n.parent.keys[k_prime_index] = neighbour.keys[1]
+		if n.IsLeaf {
+			n.Keys[n.NumKeys] = neighbour.Keys[0]
+			n.Pointers[n.NumKeys] = neighbour.Pointers[0]
+			n.Parent.Keys[k_prime_index] = neighbour.Keys[1]
 		} else {
-			n.keys[n.num_keys] = k_prime
-			n.pointers[n.num_keys+1] = neighbour.pointers[0]
-			tmp, _ = n.pointers[n.num_keys+1].(*node)
-			tmp.parent = n
-			n.parent.keys[k_prime_index] = neighbour.keys[0]
+			n.Keys[n.NumKeys] = k_prime
+			n.Pointers[n.NumKeys+1] = neighbour.Pointers[0]
+			tmp, _ = n.Pointers[n.NumKeys+1].(*Node)
+			tmp.Parent = n
+			n.Parent.Keys[k_prime_index] = neighbour.Keys[0]
 		}
-		for i = 0; i < neighbour.num_keys-1; i++ {
-			neighbour.keys[i] = neighbour.keys[i+1]
-			neighbour.pointers[i] = neighbour.pointers[i+1]
+		for i = 0; i < neighbour.NumKeys-1; i++ {
+			neighbour.Keys[i] = neighbour.Keys[i+1]
+			neighbour.Pointers[i] = neighbour.Pointers[i+1]
 		}
-		if !n.is_leaf {
-			neighbour.pointers[i] = neighbour.pointers[i+1]
+		if !n.IsLeaf {
+			neighbour.Pointers[i] = neighbour.Pointers[i+1]
 		}
 	}
-	n.num_keys += 1
-	neighbour.num_keys -= 1
+	n.NumKeys += 1
+	neighbour.NumKeys -= 1
 
 	return
 }
 
-func (t *Tree) deleteEntry(n *node, key int, pointer interface{}) {
+func (t *Tree) deleteEntry(n *Node, key int, pointer interface{}) {
 	var min_keys, neighbour_index, k_prime_index, k_prime, capacity int
-	var neighbour *node
+	var neighbour *Node
 
 	n = removeEntryFromNode(n, key, pointer)
 
@@ -773,13 +774,13 @@ func (t *Tree) deleteEntry(n *node, key int, pointer interface{}) {
 		return
 	}
 
-	if n.is_leaf {
+	if n.IsLeaf {
 		min_keys = cut(order - 1)
 	} else {
 		min_keys = cut(order) - 1
 	}
 
-	if n.num_keys >= min_keys {
+	if n.NumKeys >= min_keys {
 		return
 	}
 
@@ -791,21 +792,21 @@ func (t *Tree) deleteEntry(n *node, key int, pointer interface{}) {
 		k_prime_index = neighbour_index
 	}
 
-	k_prime = n.parent.keys[k_prime_index]
+	k_prime = n.Parent.Keys[k_prime_index]
 
 	if neighbour_index == -1 {
-		neighbour, _ = n.parent.pointers[1].(*node)
+		neighbour, _ = n.Parent.Pointers[1].(*Node)
 	} else {
-		neighbour, _ = n.parent.pointers[neighbour_index].(*node)
+		neighbour, _ = n.Parent.Pointers[neighbour_index].(*Node)
 	}
 
-	if n.is_leaf {
+	if n.IsLeaf {
 		capacity = order
 	} else {
 		capacity = order - 1
 	}
 
-	if neighbour.num_keys+n.num_keys < capacity {
+	if neighbour.NumKeys+n.NumKeys < capacity {
 		t.coalesceNodes(n, neighbour, neighbour_index, k_prime)
 		return
 	} else {
