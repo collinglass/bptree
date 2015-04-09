@@ -1,7 +1,7 @@
 bptree
 ====
 
-bptree is a pure Go B+ tree implementation inspired by [Amittai Aviram's][bpt] C implementation. The goal of the project is to maintain a tiny B+ tree with a concise API to use in the composition of more complex systems.
+bptree is a pure Go B+ tree implementation. The project started out as a Go copy of [Amittai Aviram's][bpt] C implementation. The goal of the project is to maintain a tiny B+ tree with a concise API to use in the composition of more complex systems.
 
 [bpt]: http://www.amittai.com/prose/bplustree.html
 
@@ -36,73 +36,76 @@ func main() {
 	key := 1
 	value := 2
 
-	root, err := bptree.Insert(nil, key, value)
+	t := bptree.NewTree()
 
+	err := t.Insert(key, value)
 	if err != nil {
 		fmt.Printf("error: %s\n\n", err)
 	}
 
-	r, err := bptree.Find(root, key, true)
+	r, err := t.Find(key, true)
 	if err != nil {
 		fmt.Printf("error: %s\n\n", err)
 	}
 
 	fmt.Printf("%v\n\n", r.Value)
 
-	bptree.FindAndPrint(root, key, true)
+	t.FindAndPrint(key, true)
 }
+
 ```
 
 
 ## API
 
-#### func Insert
+#### func NewTree()
 
-```func Insert(root *node, key, value int) (*node, error)```
+```func NewTree() *Tree```
+
+Returns a pointer to a new B+ tree
+
+#### func (t *Tree) Insert
+
+```func (t *Tree) Insert(root *node, key, value int) (*node, error)```
 
 Insert adds a key value pair to the b+ tree.
 
-#### func Find
+#### func (t *Tree) Find
 
-```func Find(root *node, key int, verbose bool) (*record, error)```
+```func (t *Tree) Find(root *node, key int, verbose bool) (*record, error)```
 
 Find returns the value associated with the key. If verbose is true, it gives some insight on its location in the tree.
 
-#### func FindAndPrint
+#### func (t *Tree) FindAndPrint
 
-```func FindAndPrint(root *node, key int, verbose bool)```
+```func (t *Tree) FindAndPrint(root *node, key int, verbose bool)```
 
 FindAndPrint outputs the value associated with the key. If verbose is true, it gives added insight.
 
-#### func FindAndPrintRange
+#### func (t *Tree) FindAndPrintRange
 
-```func FindAndPrintRange(root *node, key_start, key_end int, verbose bool)```
+```func (t *Tree) FindAndPrintRange(root *node, key_start, key_end int, verbose bool)```
 
 FindAndPrintRange outputs the values associated with the keys inside of the range inclusive.
 
-#### func PrintTree
+#### func (t *Tree) PrintTree
 
-```func PrintTree(root *node)```
+```func (t *Tree) PrintTree(root *node)```
 
 Prints the whole tree.
 
-#### func PrintLeaves
+#### func (t *Tree) PrintLeaves
 
-```func PrintLeaves(root *node)```
+```func (t *Tree) PrintLeaves(root *node)```
 
 Prints the leaves of the tree.
 
-#### func Delete
+#### func (t *Tree) Delete
 
-```func Delete(root *node, key int) (*node, error)```
+```func (t *Tree) Delete(root *node, key int) (*node, error)```
 
 Deletes the key value pair associated with the given key.
 
-#### func DestroyTree
-
-```func DestroyTree(root *node) *node```
-
-Destroy tree.
 
 
 
