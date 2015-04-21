@@ -7,7 +7,7 @@ import (
 
 func main() {
 	key := 1
-	value := 2
+	value := []byte("hello friend")
 
 	t := bptree.NewTree()
 
@@ -21,7 +21,7 @@ func main() {
 		fmt.Printf("error: %s\n\n", err)
 	}
 
-	fmt.Printf("%v\n\n", r.Value)
+	fmt.Printf("%s\n\n", r.Value)
 
 	t.FindAndPrint(key, true)
 }

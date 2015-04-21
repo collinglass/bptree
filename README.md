@@ -8,7 +8,7 @@ bptree is a pure Go B+ tree implementation. The project started out as a Go copy
 
 ## Project Roadmap
 
-bptree currently only supports integer values, support for any value type is in the roadmap ahead. Please submit issues/PRs for anything else you'd like to see in this package.
+bptree currently only supports integer keys. Please submit issues/PRs for anything else you'd like to see in this package.
 
 
 ## Getting Started
@@ -34,7 +34,7 @@ import (
 
 func main() {
 	key := 1
-	value := 2
+	value := []byte("hello friend")
 
 	t := bptree.NewTree()
 
@@ -48,7 +48,7 @@ func main() {
 		fmt.Printf("error: %s\n\n", err)
 	}
 
-	fmt.Printf("%v\n\n", r.Value)
+	fmt.Printf("%s\n\n", r.Value)
 
 	t.FindAndPrint(key, true)
 }
@@ -66,25 +66,25 @@ Returns a pointer to a new B+ tree
 
 #### func (t *Tree) Insert
 
-```func (t *Tree) Insert(root *node, key, value int) (*node, error)```
+```func (t *Tree) Insert(key, value int) (*node, error)```
 
 Insert adds a key value pair to the b+ tree.
 
 #### func (t *Tree) Find
 
-```func (t *Tree) Find(root *node, key int, verbose bool) (*record, error)```
+```func (t *Tree) Find(key int, verbose bool) (*record, error)```
 
 Find returns the value associated with the key. If verbose is true, it gives some insight on its location in the tree.
 
 #### func (t *Tree) FindAndPrint
 
-```func (t *Tree) FindAndPrint(root *node, key int, verbose bool)```
+```func (t *Tree) FindAndPrint(key int, verbose bool)```
 
 FindAndPrint outputs the value associated with the key. If verbose is true, it gives added insight.
 
 #### func (t *Tree) FindAndPrintRange
 
-```func (t *Tree) FindAndPrintRange(root *node, key_start, key_end int, verbose bool)```
+```func (t *Tree) FindAndPrintRange(key_start, key_end int, verbose bool)```
 
 FindAndPrintRange outputs the values associated with the keys inside of the range inclusive.
 
@@ -96,16 +96,6 @@ Prints the whole tree.
 
 #### func (t *Tree) PrintLeaves
 
-```func (t *Tree) PrintLeaves(root *node)```
+```func (t *Tree) PrintLeaves()```
 
 Prints the leaves of the tree.
-
-#### func (t *Tree) Delete
-
-```func (t *Tree) Delete(root *node, key int) (*node, error)```
-
-Deletes the key value pair associated with the given key.
-
-
-
-

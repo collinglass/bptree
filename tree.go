@@ -24,7 +24,7 @@ type Tree struct {
 }
 
 type Record struct {
-	Value int
+	Value []byte
 }
 
 type Node struct {
@@ -40,7 +40,7 @@ func NewTree() *Tree {
 	return &Tree{}
 }
 
-func (t *Tree) Insert(key, value int) error {
+func (t *Tree) Insert(key int, value []byte) error {
 	var pointer *Record
 	var leaf *Node
 
@@ -93,7 +93,7 @@ func (t *Tree) FindAndPrint(key int, verbose bool) {
 	if err != nil || r == nil {
 		fmt.Printf("Record not found under key %d.\n", key)
 	} else {
-		fmt.Printf("Record at %d -- key %d, value %d.\n", r, key, r.Value)
+		fmt.Printf("Record at %d -- key %d, value %s.\n", r, key, r.Value)
 	}
 }
 
@@ -108,7 +108,7 @@ func (t *Tree) FindAndPrintRange(key_start, key_end int, verbose bool) {
 	} else {
 		for i = 0; i < num_found; i++ {
 			c, _ := returned_pointers[i].(*Record)
-			fmt.Printf("Key: %d  Location: %d  Value: %d\n",
+			fmt.Printf("Key: %d  Location: %d  Value: %s\n",
 				returned_keys[i],
 				returned_pointers[i],
 				c.Value)
@@ -342,7 +342,7 @@ func cut(length int) int {
 //
 //	INSERTION
 //
-func makeRecord(value int) (*Record, error) {
+func makeRecord(value []byte) (*Record, error) {
 	new_record := new(Record)
 	if new_record == nil {
 		return nil, errors.New("Error: Record creation.")

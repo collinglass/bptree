@@ -11,7 +11,7 @@ func BenchmarkInsert(b *testing.B) {
 	// insert b.N times
 	for n := 0; n < b.N; n++ {
 		key := n
-		value := n + 1
+		value := []byte(fmt.Sprintf("test%d", n))
 
 		err := t.Insert(key, value)
 		if err != nil {
@@ -26,7 +26,7 @@ func BenchmarkInsertFind(b *testing.B) {
 	// insert b.N times
 	for n := 0; n < b.N; n++ {
 		key := n
-		value := n + 1
+		value := []byte(fmt.Sprintf("test%d", n))
 
 		err := t.Insert(key, value)
 
@@ -50,7 +50,7 @@ func BenchmarkInsertDelete(b *testing.B) {
 	// insert b.N times
 	for n := 0; n < b.N; n++ {
 		key := n
-		value := n + 1
+		value := []byte(fmt.Sprintf("test%d", n))
 
 		err := t.Insert(key, value)
 		if err != nil {
