@@ -8,7 +8,7 @@ bptree is a pure Go B+ tree implementation. The project started out as a Go copy
 
 ## Project Roadmap
 
-bptree currently only supports integer keys. Please submit issues/PRs for anything else you'd like to see in this package.
+Please submit issues/PRs for anything else you'd like to see in this package.
 
 
 ## Getting Started
